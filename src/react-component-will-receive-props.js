@@ -1,3 +1,5 @@
+var GLOBAL_EVENT_BUS = _.extend({}, Backbone.Events);
+
 var Parent = React.createClass({
     propTypes: {
         people: React.PropTypes.array.isRequired
@@ -9,6 +11,12 @@ var Parent = React.createClass({
             people: []
         };
     },
+
+    getInitialState: function() {
+        return {
+            people: this.props.people
+        };
+    },
     
     componentWillMount: function() {
         /*
@@ -17,6 +25,8 @@ var Parent = React.createClass({
          * to execute a callback
          */
         console.log("Parent - componentWillMount");
+
+        GLOBAL_EVENT_BUS.on("receive:new:data", this.receiveNewData, this);
     },
 
     componentDidMount: function() {
@@ -31,7 +41,7 @@ var Parent = React.createClass({
     },
 
     render: function() {
-        var people = this.props.people.map(function(person) {
+        var people = this.state.people.map(function(person) {
             return <Child person={person} key={person.name} />;
         });
 
@@ -46,6 +56,14 @@ var Parent = React.createClass({
 
     componentWillUnmount: function() {
         console.log("Parent - componentWillUnmount");
+        GLOBAL_EVENT_BUS.off("receive:new:data");
+    },
+
+    receiveNewData: function(data) {
+        console.log("Receiving new data: ", data);
+        this.setState({
+            people: data
+        });
     }
 });
 
@@ -65,8 +83,9 @@ var Child = React.createClass({
 });
 
 var app = document.getElementById("app");
-var mount1 = document.getElementById("mount1");
-var mount2 = document.getElementById("mount2");
+// var mount1 = document.getElementById("mount1");
+// var mount2 = document.getElementById("mount2");
+var update = document.getElementById("update");
 var unmount = document.getElementById("unmount");
 
 var renderIntoApp = function(people) {
@@ -103,17 +122,33 @@ var generateRandomPeople = function(numPeople) {
     return result;
 };
 
-mount1.addEventListener("click", function(e) {
-    var randomPeople = generateRandomPeople(4);
-    component = renderIntoApp(randomPeople);
-});
-
-mount2.addEventListener("click", function(e) {
-    var randomPeople = generateRandomPeople(4);
-    component = renderIntoApp(randomPeople);
-});
+// mount1.addEventListener("click", function(e) {
+//     var randomPeople = generateRandomPeople(4);
+//     component = renderIntoApp(randomPeople);
+// });
+// 
+// mount2.addEventListener("click", function(e) {
+//     var randomPeople = generateRandomPeople(4);
+//     component = renderIntoApp(randomPeople);
+// });
 
 unmount.addEventListener("click", function(e) {
     var success = unmountReactComponentAtNode(app);
     console.log("unmount success: ", success);
+
+    component = null;
+    initialUpdate = true;
+});
+
+var initialUpdate = true;
+
+update.addEventListener("click", function(e) {
+    if (initialUpdate) {
+        var randomPeople = generateRandomPeople(4);
+        component = renderIntoApp(randomPeople);
+        initialUpdate = false;
+    } else {
+        var updateRandomPeople = generateRandomPeople(5);
+        GLOBAL_EVENT_BUS.trigger("receive:new:data", updateRandomPeople);
+    }
 });
