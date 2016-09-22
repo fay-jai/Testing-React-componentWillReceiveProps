@@ -11,7 +11,11 @@ var Parent = React.createClass({
     },
     
     componentWillMount: function() {
-        // will have access to props and state here
+        /*
+         * Will have access to props and state here
+         * Can also set up hooks for event listener
+         * to execute a callback
+         */
         console.log("Parent - componentWillMount");
     },
 
