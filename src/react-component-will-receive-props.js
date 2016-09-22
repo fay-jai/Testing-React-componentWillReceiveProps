@@ -2,8 +2,26 @@ var Parent = React.createClass({
     propTypes: {
         people: React.PropTypes.array.isRequired
     },
+
+    getDefaultProps: function() {
+        console.log("Parent - getDefaultProps");
+        return {
+            people: []
+        };
+    },
     
+    componentWillMount: function() {
+        // will have access to props and state here
+        console.log("Parent - componentWillMount");
+    },
+
+    componentDidMount: function() {
+        // will have access to dom element now
+        console.log("Parent - componentDidMount");
+    },
+
     componentWillReceiveProps: function(nextProps) {
+        console.log("Parent - componentWillReceiveProps");
         console.log("current props: ", this.props);
         console.log("next props: ", nextProps);
     },
@@ -20,6 +38,10 @@ var Parent = React.createClass({
                 </ul>
             </div>
         );
+    },
+
+    componentWillUnmount: function() {
+        console.log("Parent - componentWillUnmount");
     }
 });
 
