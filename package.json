@@ -1,0 +1,17 @@
+{
+  "name": "react-component-will-receive-props",
+  "version": "1.0.0",
+  "description": "",
+  "main": "react-component-will-receive-props.js",
+  "scripts": {
+    "transpile": "babel src -d dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-preset-latest": "^6.14.0",
+    "babel-preset-react": "^6.11.1"
+  }
+}
