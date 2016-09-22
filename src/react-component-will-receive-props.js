@@ -53,21 +53,38 @@ var unmountReactComponentAtNode = function(domNode) {
 };
 
 var component = null;
-var props1 = [
-    { name: "Dennis", age: 32 },
-    { name: "Willson", age: 31 }
-];
-var props2 = [
-    { name: "Edwin", age: 30 },
-    { name: "Cheryl", age: 29 }
-];
+// var props1 = [
+//     { name: "Dennis", age: 32 },
+//     { name: "Willson", age: 31 }
+// ];
+// var props2 = [
+//     { name: "Edwin", age: 30 },
+//     { name: "Cheryl", age: 29 }
+// ];
+
+var generateRandomPerson = function() {
+    return {
+        name: Math.random().toString(36).substring(7),
+        age: Math.floor(Math.random() * 100)
+    };
+};
+
+var generateRandomPeople = function(numPeople) {
+    var result = [];
+    for (var i = 0; i < numPeople; i += 1) {
+        result.push(generateRandomPerson());
+    }
+    return result;
+};
 
 mount1.addEventListener("click", function(e) {
-    component = renderIntoApp(props1);
+    var randomPeople = generateRandomPeople(4);
+    component = renderIntoApp(randomPeople);
 });
 
 mount2.addEventListener("click", function(e) {
-    component = renderIntoApp(props2);
+    var randomPeople = generateRandomPeople(4);
+    component = renderIntoApp(randomPeople);
 });
 
 unmount.addEventListener("click", function(e) {
