@@ -1,10 +1,5 @@
 var Parent = React.createClass({
-    propTypes: {
-        people: React.PropTypes.array.isRequired
-    },
-
-    getDefaultProps: function() {
-        console.log("Parent - getDefaultProps");
+    getInitialState: function() {
         return {
             people: []
         };
@@ -18,6 +13,9 @@ var Parent = React.createClass({
          * re-create this component instance.
          */
         console.log("Parent - componentWillMount");
+        this.setState({
+            people: generateRandomPeople(4)
+        });
     },
 
     componentDidMount: function() {
@@ -28,21 +26,23 @@ var Parent = React.createClass({
         console.log("Parent - componentDidMount");
     },
 
-    componentWillReceiveProps: function(nextProps) {
-        /*
-         * This will be called every time.
-         */
-        console.log("Parent - componentWillReceiveProps", nextProps);
-    },
-
     render: function() {
-        var people = this.props.people.map(function(person) {
-            /*
-             * Because the Child component is not the one being
-             * mounted onto the DOM by ReactDOM, it will re-create
-             * a new Child component each time the Parent render
-             * is called.
-             */
+        /*
+         * The way its currently configured, 
+         * renderIntoApp gets called on every click
+         * but the Parent component doesn't
+         * get created every time. However,
+         * a render is still executed for Parent
+         * using it's state. However, state never gets
+         * updated because componentWillMount
+         * gets called only once. The Child component
+         * will receive the state data every time
+         * but since there's no change in the data,
+         * nothing happens even though its
+         * componentWillReceiveProps method is called.
+         */
+        console.log("Parent - render: state - ", this.state);
+        var people = this.state.people.map(function(person) {
             return <Child person={person} key={person.name} />;
         });
 
@@ -75,14 +75,9 @@ var Child = React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
         /*
-         * This componentWillReceiveProps never gets called
-         * because this component always gets re-created
-         * from the Parent render function.
-         * By definition, componentWillReceiveProps
-         * never gets called on the first render (and
-         * the way its currently set up, each render
-         * is the first render of Child).
-         */
+         * In the current scenario, this method
+         * gets called
+         */ 
         console.log("Child - componentWillReceiveProps", nextProps);
     },
 
@@ -104,8 +99,18 @@ var app = document.getElementById("app");
 var mount = document.getElementById("mount");
 var unmount = document.getElementById("unmount");
 
-var renderIntoApp = function(people) {
-    var reactElement = <Parent people={people} />;
+var renderIntoApp = function() {
+    /*
+     * Even though a new react element is created,
+     * when ReactDOM.render sees that the same
+     * element type is being rendered onto the same DOM
+     * element, it doesn't create a new component instance.
+     * This means that the component will not mount again.
+     * This is why my this.setState in the componentWillMount
+     * method never gets called again even though I click
+     * on the buttons.
+     */
+    var reactElement = <Parent />;
     return ReactDOM.render(reactElement, app);
 };
 
@@ -131,8 +136,7 @@ var generateRandomPeople = function(numPeople) {
 };
 
 mount.addEventListener("click", function(e) {
-    var randomPeople = generateRandomPeople(4);
-    component = renderIntoApp(randomPeople);
+    component = renderIntoApp();
 });
 
 unmount.addEventListener("click", function(e) {
