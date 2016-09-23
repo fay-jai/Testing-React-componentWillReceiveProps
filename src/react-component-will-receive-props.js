@@ -10,6 +10,12 @@ var Parent = React.createClass({
         };
     },
     
+    getInitialState: function() {
+        return {
+            people: this.props.people
+        };
+    },
+
     componentWillMount: function() {
         /*
          * This will only ever be called once because
@@ -33,10 +39,14 @@ var Parent = React.createClass({
          * This will be called every time.
          */
         console.log("Parent - componentWillReceiveProps", nextProps);
+        var people = nextProps.people;
+        this.setState({
+            people: people
+        });
     },
 
     render: function() {
-        var people = this.props.people.map(function(person) {
+        var people = this.state.people.map(function(person) {
             /*
              * Because the Child component is not the one being
              * mounted onto the DOM by ReactDOM, it will re-create
