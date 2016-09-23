@@ -12,26 +12,37 @@ var Parent = React.createClass({
     
     componentWillMount: function() {
         /*
-         * Will have access to props and state here
-         * Can also set up hooks for event listener
-         * to execute a callback
+         * This will only ever be called once because
+         * the Parent component is mounted once
+         * and React is smart enough to not
+         * re-create this component instance.
          */
         console.log("Parent - componentWillMount");
     },
 
     componentDidMount: function() {
-        // will have access to dom element now
+        /*
+         * Similar to componentWillMount, this is
+         * called just once.
+         */
         console.log("Parent - componentDidMount");
     },
 
     componentWillReceiveProps: function(nextProps) {
-        console.log("Parent - componentWillReceiveProps");
-        console.log("current props: ", this.props);
-        console.log("next props: ", nextProps);
+        /*
+         * This will be called every time.
+         */
+        console.log("Parent - componentWillReceiveProps", nextProps);
     },
 
     render: function() {
         var people = this.props.people.map(function(person) {
+            /*
+             * Because the Child component is not the one being
+             * mounted onto the DOM by ReactDOM, it will re-create
+             * a new Child component each time the Parent render
+             * is called.
+             */
             return <Child person={person} key={person.name} />;
         });
 
@@ -54,6 +65,27 @@ var Child = React.createClass({
         person: React.PropTypes.object.isRequired
     },
 
+    componentWillMount: function() {
+        console.log("Child - componentWillMount");
+    },
+
+    componentDidMount: function() {
+        console.log("Child - componentDidMount");
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+        /*
+         * This componentWillReceiveProps never gets called
+         * because this component always gets re-created
+         * from the Parent render function.
+         * By definition, componentWillReceiveProps
+         * never gets called on the first render (and
+         * the way its currently set up, each render
+         * is the first render of Child).
+         */
+        console.log("Child - componentWillReceiveProps", nextProps);
+    },
+
     render: function() {
         return (
             <li className="child">
@@ -61,12 +93,15 @@ var Child = React.createClass({
                 <p>The persons age is: {this.props.person.age}</p>
             </li>
         );
+    },
+
+    componentWillUnmount: function() {
+        console.log("Child - componentWillUnmount");
     }
 });
 
 var app = document.getElementById("app");
-var mount1 = document.getElementById("mount1");
-var mount2 = document.getElementById("mount2");
+var mount = document.getElementById("mount");
 var unmount = document.getElementById("unmount");
 
 var renderIntoApp = function(people) {
@@ -79,14 +114,6 @@ var unmountReactComponentAtNode = function(domNode) {
 };
 
 var component = null;
-// var props1 = [
-//     { name: "Dennis", age: 32 },
-//     { name: "Willson", age: 31 }
-// ];
-// var props2 = [
-//     { name: "Edwin", age: 30 },
-//     { name: "Cheryl", age: 29 }
-// ];
 
 var generateRandomPerson = function() {
     return {
@@ -103,12 +130,7 @@ var generateRandomPeople = function(numPeople) {
     return result;
 };
 
-mount1.addEventListener("click", function(e) {
-    var randomPeople = generateRandomPeople(4);
-    component = renderIntoApp(randomPeople);
-});
-
-mount2.addEventListener("click", function(e) {
+mount.addEventListener("click", function(e) {
     var randomPeople = generateRandomPeople(4);
     component = renderIntoApp(randomPeople);
 });
